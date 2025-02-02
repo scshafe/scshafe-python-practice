@@ -1,6 +1,5 @@
 
 
-
 class BinaryNum:
     def __init__(self, num: int):
         self.num = num
@@ -27,9 +26,6 @@ class BinaryNum:
 
     def __iter__(self):
         return iter(self.binary_num)
-    
-    # def __next__(self):
-    #     return 
     
     def add_pad(self, pad: list):
         self.binary_num = self.binary_num + pad
@@ -68,28 +64,34 @@ def carry_look_ahead_add(bnum1, bnum2):
 
     def xor(bit1, bit2):
         return bit1 != bit2
-        # return True if (bit1 and not bit2) or (not bit1 and bit2) else False
     
     counter = 0
     propagate = [xor(x[0], x[1]) for x in zip(bnum1, bnum2)]
+    counter += 4 * len(bnum1)
     generate  = [True if x[0] and x[1] else False for x in zip(bnum1, bnum2)]
+    counter += len(bnum1)
 
-    print_bool_arr_as_binary("propagate: ", propagate)
-    print_bool_arr_as_binary("generate:  ", generate)
+    # print_bool_arr_as_binary("propagate: ", propagate)
+    # print_bool_arr_as_binary("generate:  ", generate)
     
-    # carry is indexed '+1' offset
     carry = []
     carry.append(False)
-    # carry_plus.append(True if generate[0] else False)
-    for i in range(1, len(bnum1)):
+    for i in range(1, len(bnum1)+1):
         carry.append(True if generate[i-1] or (propagate[i-1] and carry[i-1]) else False)
-    
-    print_bool_arr_as_binary("carry:     ", carry)
+
+        # this must be calculated for each carry bit without using recursion because they must all be
+        # accessible at the same time. If they use the previous carry bit in the calculation
+        # that is essentially the same as the ripple-adder circuit.
+        counter += 2**i
+
+    # print_bool_arr_as_binary("carry:     ", carry)
 
     sum = [True if xor(a,b) else False for a,b in zip(propagate, carry)]
-
+    counter += 4 * len(propagate)
 
     output = num_from_binary_num(sum)
+
+    print("\ngates used: ", counter)
     print(output)
 
 
