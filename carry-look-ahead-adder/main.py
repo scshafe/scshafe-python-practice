@@ -9,7 +9,6 @@ class BinaryNum:
         while tmp > 0:
             self.binary_num.append(True if tmp % 2 == 1 else False)
             tmp = tmp >> 1
-        # self.binary_num = self.binary_num
         
     def __str__(self):
         return "".join(['1' if x else '0' for x in self.binary_num])
