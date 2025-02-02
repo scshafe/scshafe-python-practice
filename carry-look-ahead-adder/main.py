@@ -10,13 +10,13 @@ class BinaryNum:
         while tmp > 0:
             self.binary_num.append(True if tmp % 2 == 1 else False)
             tmp = tmp >> 1
-        self.binary_num = self.binary_num[::-1]
+        # self.binary_num = self.binary_num
         
     def __str__(self):
         return "".join(['1' if x else '0' for x in self.binary_num])
     
     def print_decimal(self):
-        tmp = self.binary_num[::-1]
+        tmp = self.binary_num
         count = 0
         for i in range(len(tmp)):
             count += tmp[i] * 2**i
@@ -32,8 +32,7 @@ class BinaryNum:
     #     return 
     
     def add_pad(self, pad: list):
-        print(self.binary_num)
-        self.binary_num = pad + self.binary_num
+        self.binary_num = self.binary_num + pad
 
 def pad_nums(bnum1, bnum2):
     assert(type(bnum1) == BinaryNum and type(bnum2) == BinaryNum)
@@ -48,12 +47,14 @@ def num_from_binary_num(binary_num):
     num = 0
     index = 0
 
-    for x in binary_num[::-1]:
+    for x in binary_num:
         num += 2**index if x else 0
         index+=1
     return num
 
 
+def print_bool_arr_as_binary(message, array):
+    print(message, "".join(['1' if x else '0' for x in array]))
 
 # Pi     = Ai xor Bi
 # Gi     = Ai and Bi
@@ -66,19 +67,27 @@ def carry_look_ahead_add(bnum1, bnum2):
     
 
     def xor(bit1, bit2):
-        return True if (bit1 and not bit2) or (not bit1 and bit2) else False
+        return bit1 != bit2
+        # return True if (bit1 and not bit2) or (not bit1 and bit2) else False
     
     counter = 0
-    propagate = [True if xor(x[0], x[1]) else False for x in zip(bnum1, bnum2)]
+    propagate = [xor(x[0], x[1]) for x in zip(bnum1, bnum2)]
     generate  = [True if x[0] and x[1] else False for x in zip(bnum1, bnum2)]
+
+    print_bool_arr_as_binary("propagate: ", propagate)
+    print_bool_arr_as_binary("generate:  ", generate)
     
-    # carry_plus is indexed '+1' offset
-    carry_plus = []
-    carry_plus.append(True if generate[0] else False)
+    # carry is indexed '+1' offset
+    carry = []
+    carry.append(False)
+    # carry_plus.append(True if generate[0] else False)
     for i in range(1, len(bnum1)):
-        carry_plus.append(True if generate[i] or (propagate[i] and carry_plus[i-1]) else False)
+        carry.append(True if generate[i-1] or (propagate[i-1] and carry[i-1]) else False)
     
-    sum = ['1' if xor(x[0], x[1]) else '0' for x in zip(propagate, carry_plus)]
+    print_bool_arr_as_binary("carry:     ", carry)
+
+    sum = [True if xor(a,b) else False for a,b in zip(propagate, carry)]
+
 
     output = num_from_binary_num(sum)
     print(output)
